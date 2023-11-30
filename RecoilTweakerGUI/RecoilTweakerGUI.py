@@ -258,11 +258,11 @@ class App(customtkinter.CTk):
 
 
 
-    def compareSwitch(self, toggledSwitch):
-        if toggledSwitch == self.globalToggle:
-            self.classToggle.deselect()
-        else:
-            self.globalToggle.deselect()
+    #def compareSwitch(self, toggledSwitch):
+    #    if toggledSwitch == self.globalToggle:
+    #        self.classToggle.deselect()
+    #    else:
+    #        self.globalToggle.deselect()
 
 
     def __init__(self):
@@ -300,14 +300,14 @@ class App(customtkinter.CTk):
 
         # Toggle Tab
         self.globalToggle = customtkinter.CTkSwitch(
-            master=self.toggleTab, text="Global Toggle", font=self.buttonFont, command= lambda: self.compareSwitch(self.globalToggle))
+            master=self.toggleTab, text="Global Toggle", font=self.buttonFont)
         self.globalToggle.grid(padx=10, pady=10, column=0, row=0, sticky="w")
         ToolTip(self.globalToggle, msg="Toggle on if you want to set every weapon's recoil.", delay=0.5, parent_kwargs={"bg": "black", "padx": 1, "pady": 1},
         fg="#ffffff", bg="#1c1c1c", padx=10, pady=10, font=self.toolTipFont)
         self.globalToggle.select()
 
         self.classToggle = customtkinter.CTkSwitch(
-            master=self.toggleTab, text="Weapon Class Toggle", font=self.buttonFont, command= lambda: self.compareSwitch(self.classToggle))
+            master=self.toggleTab, text="Weapon Class Toggle", font=self.buttonFont)
         self.classToggle.grid(padx=10, pady=10, column=0, row=1, sticky="w")
         ToolTip(self.classToggle, msg="Toggle on if you want to set class-wide recoil.", delay=0.5, parent_kwargs={"bg": "black", "padx": 1, "pady": 1},
         fg="#ffffff", bg="#1c1c1c", padx=10, pady=10, font=self.toolTipFont)
