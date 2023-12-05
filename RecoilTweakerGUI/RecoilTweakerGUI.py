@@ -11,7 +11,7 @@ customtkinter.set_default_color_theme("dark-blue")
 
 class App(customtkinter.CTk):
 
-    def importFunction(self):
+    def importFunction(self, file=""):
 
         def importToggle(self, contains, toggle, line):
             if(contains in line):
@@ -30,7 +30,10 @@ class App(customtkinter.CTk):
 
         try:
             #filename = fd.askopenfilename(title="Choose config file", filetypes=(("JSON File", "*.json"),))
-            filename = os.path.dirname(__file__) + '/../config/config.json'
+            if os.path.exists(file):
+                filename = file
+            else:
+                filename = os.path.dirname(__file__) + '/../config/config.json'
             importFile = open(filename, 'r')
             Lines = importFile.readlines()
             for line in Lines:
@@ -115,16 +118,26 @@ class App(customtkinter.CTk):
 
         except FileNotFoundError:
             print("File not found!")
-            CTkMessagebox(title="Import", icon="cancel", message="Could not open: " + filename)
+            msg = CTkMessagebox(title="Import", icon="cancel", message="Could not open: " + filename + "\n\nWould you like to create a new file instead?", option_1="No", option_2="Yes")
+            if msg.get() == "Yes":
+                try:
+                    open(filename, "x")
+                    self.defaultFunction()
+                    CTkMessagebox(title="Import", icon="check", message="File created! Please click export again to save changes!")
+                except FileExistsError:
+                    CTkMessagebox(title="Import", icon="cancel", message="File already exists? Stop messing me around.")
 
         self.savedPath = filename
 
 
-    def exportFunction(self):
-        filename = os.path.dirname(__file__) + '/../config/config.json'
-
-        msg = CTkMessagebox(title="Export", message="Are you sure you want to export current settings?", icon="question", option_1="No", option_2="Yes")
-        response = msg.get()
+    def exportFunction(self, path=""):
+        if not path == "":
+            filename = path + '/config.json'
+            response = "Yes"
+        else:
+            filename = os.path.dirname(__file__) + '/../config/config.json'
+            msg = CTkMessagebox(title="Export", message="Are you sure you want to export current settings?", icon="question", option_1="No", option_2="Yes")
+            response = msg.get()
 
         if response == "Yes":
             try:
@@ -236,7 +249,7 @@ class App(customtkinter.CTk):
                 CTkMessagebox(title="Export", icon="check", message="Successfully exported to: " + filename)
 
             except FileNotFoundError:
-                CTkMessagebox(title="Export", icon="cancel", message="Could not export to: " + filename)
+                msg = CTkMessagebox(title="Export", icon="cancel", message="Could not export to: " + filename)
 
     def defaultFunction(self):
 
@@ -256,23 +269,33 @@ class App(customtkinter.CTk):
                 for entry in table:
                     changeValue(entry, 1)
 
+    def findPresets(self):
+        newPath = os.path.dirname(__file__) + '/../presets/'
+        presetList = next(os.walk(newPath))[1]
+        return presetList;
 
+    def loadPreset(self):
+        curPreset = self.presetCombobox.get()
+        configFile = os.path.dirname(__file__) + '/../presets/' + curPreset + "/config.json"
+        self.importFunction(configFile)
 
-    #def compareSwitch(self, toggledSwitch):
-    #    if toggledSwitch == self.globalToggle:
-    #        self.classToggle.deselect()
-    #    else:
-    #        self.globalToggle.deselect()
-
+    def savePreset(self):
+        curPreset = self.presetCombobox.get()
+        pathPreset = os.path.dirname(__file__) + '/../presets/' + curPreset
+        if not os.path.exists(pathPreset):
+            try:
+                os.mkdir(pathPreset)
+            except FileExistsError:
+                print("Directory already exists!")
+        self.presetCombobox.configure(values=self.findPresets())
+        self.exportFunction(pathPreset)
 
     def __init__(self):
         super().__init__()
 
         self.geometry("800x500")
         self.title("Recoil Config Editor")
-
         self.savedPath = ""
-
         self.buttonFont = customtkinter.CTkFont(family="Roboto", size=14)
         self.toolTipFont = customtkinter.CTkFont(family="Roboto", size=12)
 
@@ -297,6 +320,15 @@ class App(customtkinter.CTk):
         self.defaultButton = customtkinter.CTkButton(
             master=self, font=self.buttonFont, text="Defaults", width=100, height=30, command=self.defaultFunction)
         self.defaultButton.pack(padx=10, pady=10, side="left")
+        self.presetCombobox = customtkinter.CTkComboBox(
+            master=self, font=self.buttonFont, values=self.findPresets(), width=150, height=30)
+        self.presetCombobox.pack(padx=10, pady=10, side="left")
+        self.loadPresetButton = customtkinter.CTkButton(
+            master=self, font=self.buttonFont, text="Load Preset", width=100, height=30, command=self.loadPreset)
+        self.loadPresetButton.pack(padx=10, pady=10, side="left")
+        self.savePresetButton = customtkinter.CTkButton(
+            master=self, font=self.buttonFont, text="Save Preset", width=100, height=30, command=self.savePreset)
+        self.savePresetButton.pack(padx=10, pady=10, side="left")
 
         # Toggle Tab
         self.globalToggle = customtkinter.CTkSwitch(
@@ -819,6 +851,7 @@ class App(customtkinter.CTk):
             self.mainGlobals,
             self.advGlobals,
             self.pistolValues,
+            self.smgValues,
             self.shotgunValues,
             self.acValues,
             self.arValues,

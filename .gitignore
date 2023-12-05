@@ -1169,3 +1169,9 @@ dist/RecoilTweakerGUI/ctkmessagebox/icons/check.png
 dist/RecoilTweakerGUI/ctkmessagebox/icons/info.png
 dist/RecoilTweakerGUI/ctkmessagebox/icons/question.png
 dist/RecoilTweakerGUI/ctkmessagebox/icons/warning.png
+presets/0% Recoil/config.json
+presets/50% Recoil/config.json
+presets/75% Recoil/config.json
+presets/Default/config.json
+presets/README.txt
+presets/SPT Realism/config.json
